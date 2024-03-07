@@ -22,8 +22,8 @@ public class WitherSpawnDetector extends Module {
     }
     //Thanks to Gurkenwerfer_ for basically telling me everything
     private final Setting<Boolean> withers = sgWorldEvents.add(new BoolSetting.Builder()
-        .name("")
-        .description("  ")
+        .name("Wither Panic")
+        .description("Sends a chat message when a wither spawns.")
         .defaultValue(true)
         .build()
     );
@@ -45,19 +45,17 @@ public class WitherSpawnDetector extends Module {
             assert mc.player != null;
             mc.player.networkHandler.sendChatMessage(messageContent.get((int) (Math.random() * messageContent.size())));
         } catch (NullPointerException e) {
+            MessyCoding.LOG.error("Error sending panic message: " + e);
         }
     }
 
     @EventHandler
     private void onPanicPacket(PacketEvent.Receive event) {
         if (event.packet instanceof WorldEventS2CPacket packet) {
-            switch (packet.getEventId()) {
-                case 1023:
-                    if (withers.get()) panic();
-                    break;
+            // if a switch statement only has one case, it's better to use an if statement
+            if (packet.getEventId() == 1023) {
+                if (withers.get()) panic();
             }
-
-
         }
     }
 }

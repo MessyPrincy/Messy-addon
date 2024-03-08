@@ -30,7 +30,7 @@ public class WitherSpawnDetector extends Module {
     private final Setting<String> customPanicMessage = sgWorldEvents.add(new StringSetting.Builder()
         .name("Panic message")
         .description("Custom panic Message")
-        .defaultValue("Wither attack! Scared!")
+        .defaultValue("AAAAH!! PANIC!!")
         .build()
     );
     public void panic() {

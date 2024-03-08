@@ -3,7 +3,7 @@
   "id": "messy-coding",
   "version": "${version}",
   "name": "Messy Coding",
-  "description": "A Coding Mess which results in an addon for Meteor client",
+  "description": "A mess of a code which results in an addon for Meteor",
   "authors": [
     "MessyPrincy"
   ],
@@ -25,7 +25,7 @@
   },
   "depends": {
     "java": ">=17",
-    "minecraft": ">=1.20.4",
+    "minecraft": ">=${mc_version}",
     "meteor-client": "*"
   }
 }

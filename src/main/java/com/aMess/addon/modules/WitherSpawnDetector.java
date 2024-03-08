@@ -30,18 +30,18 @@ public class WitherSpawnDetector extends Module {
     private final Setting<String> customPanicMessage = sgWorldEvents.add(new StringSetting.Builder()
         .name("Panic message")
         .description("Custom panic Message")
-        .defaultValue("Wither attack! Scared!")
+        .defaultValue("AAAAAH!! PANIC!!")
         .build()
     );
     private final Setting<Boolean> overwriteRandomMessage = sgWorldEvents.add(new BoolSetting.Builder()
-        .name("Overwrite \n Random \n Messages")
+        .name("Overwrite")
         .description("Selecting this causes the custom message to be the only one sent and ignore the pre-generated ones")
         .defaultValue(false)
         .build()
     );
 
     public void panic() {
-        boolean overwrite = overwriteRandomMessage.get();
+        boolean overwriteOn = overwriteRandomMessage.get();
         //Applied later on because my coding is a mess, also did not find a better way to call the boolean
         List<String> messageContent =
             List.of(
@@ -52,10 +52,9 @@ public class WitherSpawnDetector extends Module {
 
         try {
             assert mc.player != null;
-            if (overwrite) {
+            if (overwriteOn) {
                 mc.player.networkHandler.sendChatMessage(customPanicMessage.get());
-            }
-            else {
+            } else {
                 mc.player.networkHandler.sendChatMessage(messageContent.get((int) (Math.random() * messageContent.size())));
             }
         } catch (NullPointerException e) {

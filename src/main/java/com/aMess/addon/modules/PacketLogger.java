@@ -20,6 +20,7 @@ import java.util.List;
 public class PacketLogger extends Module {
 
     private final SettingGroup sgConfiguration = settings.createGroup("Configuration");
+    private final SettingGroup sgSpam = settings.createGroup("Spam filters");
         public PacketLogger() {
         super(MessyCoding.CATEGORY, "Packet Logger", "Logs received and sent packets");
     }
@@ -43,21 +44,31 @@ public class PacketLogger extends Module {
         .defaultValue(false)
         .build()
     );
-    private final Setting<Boolean> spamFilter = sgConfiguration.add(new BoolSetting.Builder()
+    private final Setting<Boolean> spamFilter = sgSpam.add(new BoolSetting.Builder()
         .name("Spam filter")
-        .description("Removes spam packets (class_2676, class_2781, class_2604, class_2739, class_2684, class_2743, class_2761,class_2828, class_2848, class_2777, class_2672, class_2663, class_2626, class_2726, class_2637, class_2743, class_2739, class_2744, class_2604, class_2781, class_2726, class_2784, class_2684$class_2685, class_2684$class_2686, class_2684$class_2687, class_2828$class_2829, class_2828$class_2831, class_2828$class_2830)")
+        .description("Removes spam packets (class_2772, class_2676, class_2781, class_2604, class_2739, class_2684, class_2743, class_2761,class_2828, class_2848, class_2777, class_2672, class_2663, class_2626, class_2726, class_2637, class_2743, class_2739, class_2744, class_2604, class_2781, class_2726, class_2784, class_2684$class_2685, class_2684$class_2686, class_2684$class_2687, class_2828$class_2829, class_2828$class_2831, class_2828$class_2830)")
         .defaultValue(true)
         .build()
     );
 
-    List<String> spamPackets = new ArrayList<String>();
+    /*private final Setting<Boolean> automaticSpamFilter = sgSpam.add(new BoolSetting.Builder()
+        .name("Automatic spam filter")
+        .description("Automatically removes packets that are being spammed in the logs (Not recommended)")
+        .defaultValue(false)
+        .build()
+    );*/
+
+    List<String> spamPackets = new ArrayList<>();
 
     @Override
     public void onActivate() {
         assert mc.player != null;
         mc.player.sendMessage(Text.of("Logging packets"));
+        /*if (automaticSpamFilter.get()){
 
+        }*/
         if (spamFilter.get()) {
+            spamPackets.add("net.minecraft.class_2772");
             spamPackets.add("net.minecraft.class_2743");
             spamPackets.add("net.minecraft.class_2739");
             spamPackets.add("net.minecraft.class_2744");

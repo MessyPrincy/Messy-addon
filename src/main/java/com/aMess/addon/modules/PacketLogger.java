@@ -4,6 +4,7 @@ import com.aMess.addon.MessyCoding;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.settings.BoolSetting;
+import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
@@ -13,7 +14,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 //Mostly for personal use to get access to sent and received packets
@@ -21,7 +24,8 @@ public class PacketLogger extends Module {
 
     private final SettingGroup sgConfiguration = settings.createGroup("Configuration");
     private final SettingGroup sgSpam = settings.createGroup("Spam filters");
-        public PacketLogger() {
+
+    public PacketLogger() {
         super(MessyCoding.CATEGORY, "Packet Logger", "Logs received and sent packets");
     }
 
@@ -51,22 +55,27 @@ public class PacketLogger extends Module {
         .build()
     );
 
-    /*private final Setting<Boolean> automaticSpamFilter = sgSpam.add(new BoolSetting.Builder()
+    private final Setting<Boolean> automaticSpamFilter = sgSpam.add(new BoolSetting.Builder()
         .name("Automatic spam filter")
         .description("Automatically removes packets that are being spammed in the logs (Not recommended)")
         .defaultValue(false)
         .build()
-    );*/
-
+    );
+    private final Setting<Integer> automaticSpamFilterStrength = sgSpam.add(new IntSetting.Builder()
+        .name("Auto Spam Filter Strength")
+        .description("The number of packets to detect duplicates within")
+        .defaultValue(2)
+        .min(2)
+        .sliderMax(20)
+        .build()
+    );
     List<String> spamPackets = new ArrayList<>();
 
     @Override
     public void onActivate() {
+        spamPackets.clear();
         assert mc.player != null;
         mc.player.sendMessage(Text.of("Logging packets"));
-        /*if (automaticSpamFilter.get()){
-
-        }*/
         if (spamFilter.get()) {
             spamPackets.add("net.minecraft.class_2772");
             spamPackets.add("net.minecraft.class_2743");
@@ -100,26 +109,73 @@ public class PacketLogger extends Module {
         }
     }
 
+    List<String> Packets = new ArrayList<>();
+    Set<String> isReceivedDuplicate = new HashSet<>();
+    Set<String> isSentDuplicate = new HashSet<>();
+
     @EventHandler
     private void onReceivedPacket(PacketEvent.Receive event) {
         if (checkReceivedPacket.get())
-            if (!spamPackets.contains(event.packet.getClass().getCanonicalName())){
-                LogUtils.getLogger().info(event.packet.toString());
-                assert mc.player != null;
-                if (chatLog.get())
-                    ChatUtils.sendMsg(Formatting.DARK_GREEN,"Received packet: " + event.packet.toString());
+            if (automaticSpamFilter.get()) {
+                if (Packets.size() == automaticSpamFilterStrength.get()) {
+                    for (String element : Packets) {
+                        if (!isReceivedDuplicate.add(element)) {
+                            ChatUtils.sendMsg(Formatting.DARK_BLUE, isReceivedDuplicate.toString());
+                            isReceivedDuplicate.clear();
+                            if (!spamPackets.contains(element)) {
+                                spamPackets.add(element);
+                                ChatUtils.sendMsg(Formatting.DARK_AQUA, "Received packet: " + element + " filtered for spam with those two packets " + Packets);
+                            }
+                        }
+                    }
+                    Packets.clear();
+                } else if (Packets.size() > automaticSpamFilterStrength.get()) {
+                    Packets.clear();
+                    ChatUtils.sendMsg(Formatting.RED, "Too many packets received at the same time");
+                } else {
+                    Packets.add(event.packet.getClass().getCanonicalName());
+                }
+            }
+        if (!spamPackets.contains(event.packet.getClass().getCanonicalName())) {
+            LogUtils.getLogger().info(event.packet.toString());
+            assert mc.player != null;
+            if (chatLog.get())
+                ChatUtils.sendMsg(Formatting.DARK_GREEN, "Received packet: " + event.packet.toString());
         }
     }
 
     @EventHandler
     private void onSendPacket(PacketEvent.Send event) {
-        if (checkSendPacket.get())
-            if (!spamPackets.contains(event.packet.getClass().getCanonicalName())){
-                LogUtils.getLogger().info(event.packet.toString());
-                assert mc.player != null;
-                if (chatLog.get())
-                    ChatUtils.sendMsg(Formatting.DARK_RED,"Sent packet: " + event.packet.toString());
-        }
-    }
+        if (checkSendPacket.get()) {
+            if (automaticSpamFilter.get()) {
+                if (Packets.size() == automaticSpamFilterStrength.get()) {
+                    for (String element : Packets) {
+                        if (!isSentDuplicate.add(element)) {
+                            ChatUtils.sendMsg(Formatting.BLUE, isSentDuplicate.toString());
+                            isSentDuplicate.clear();
+                            if (!spamPackets.contains(element)) {
+                                spamPackets.add(element);
+                                ChatUtils.sendMsg(Formatting.DARK_AQUA, "Sent: " + element + " filtered for spam with those two packets " + Packets);
+                            }
+                        }
+                    }
+                    Packets.clear();
+                } else if (Packets.size() > automaticSpamFilterStrength.get()) {
+                    Packets.clear();
+                    ChatUtils.sendMsg(Formatting.RED, "Too many packets sent at the same time");
+                } else {
+                    Packets.add(event.packet.getClass().getCanonicalName());
+                }
+            }
 
+            if (checkSendPacket.get())
+                if (!spamPackets.contains(event.packet.getClass().getCanonicalName())) {
+                    LogUtils.getLogger().info(event.packet.toString());
+                    assert mc.player != null;
+                    if (chatLog.get())
+                        ChatUtils.sendMsg(Formatting.DARK_RED, "Sent packet: " + event.packet.toString());
+                }
+        }
+
+    }
 }

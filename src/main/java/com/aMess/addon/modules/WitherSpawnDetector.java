@@ -41,8 +41,6 @@ public class WitherSpawnDetector extends Module {
     );
 
     public void panic() {
-        boolean overwriteOn = overwriteRandomMessage.get();
-        //Applied later on because my coding is a mess, also did not find a better way to call the boolean
         List<String> messageContent =
             List.of(
                 "Wither spawned unexpectedly! Not ready! Panic!",
@@ -52,7 +50,7 @@ public class WitherSpawnDetector extends Module {
 
         try {
             assert mc.player != null;
-            if (overwriteOn) {
+            if (overwriteRandomMessage.get()) {
                 mc.player.networkHandler.sendChatMessage(customPanicMessage.get());
             } else {
                 mc.player.networkHandler.sendChatMessage(messageContent.get((int) (Math.random() * messageContent.size())));

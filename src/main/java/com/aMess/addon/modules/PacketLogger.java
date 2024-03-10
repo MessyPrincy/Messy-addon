@@ -53,7 +53,7 @@ public class PacketLogger extends Module {
     );
 
     private final Setting<Boolean> automaticSpamFilter = sgSpam.add(new BoolSetting.Builder()
-        .name("Automatic spam filter")
+        .name("Automatic Spam Filter")
         .description("Automatically removes packets that are being spammed in the logs (Not recommended)")
         .defaultValue(false)
         .build()
@@ -66,7 +66,6 @@ public class PacketLogger extends Module {
         .sliderMax(200)
         .build()
     );
-    List<String> manualSpamPackets = Collections.synchronizedList(new ArrayList<>());
     List<String> spamPackets = Collections.synchronizedList(new ArrayList<>());
 
     @Override

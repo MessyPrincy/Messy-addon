@@ -43,9 +43,9 @@ public class WitherSpawnDetector extends Module {
     public void panic() {
         List<String> messageContent =
             List.of(
-                "Wither spawned unexpectedly! Not ready! Panic!",
-                "Help! Wither wrecking my world! Freaking out!",
-                "Bad! Wither loose! Trapped! Panic!",
+                "Wither spawned unexpectedly! Not ready! PANIC!",
+                "Help! Wither wrecking my world! Freaking out! AAAAH!!",
+                "Bad! Wither loose! Trapped! PANIC!",
                 customPanicMessage.get());
 
         try {

@@ -13,10 +13,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 //Mostly for personal use to get access to sent and received packets
@@ -69,7 +66,7 @@ public class PacketLogger extends Module {
         .sliderMax(20)
         .build()
     );
-    List<String> spamPackets = new ArrayList<>();
+    List<String> spamPackets = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void onActivate() {
@@ -109,19 +106,24 @@ public class PacketLogger extends Module {
         }
     }
 
-    List<String> Packets = new ArrayList<>();
-    Set<String> isReceivedDuplicate = new HashSet<>();
-    Set<String> isSentDuplicate = new HashSet<>();
-
+    List<String> Packets = Collections.synchronizedList(new ArrayList<>());
+    Set<String> seenStrings = new HashSet<>();
+    public boolean isDuplicate(String element) {
+        if (seenStrings.contains(element)) {
+            seenStrings.clear();
+            return true;
+        } else {
+            seenStrings.clear();
+            return false;
+        }
+    }
     @EventHandler
     private void onReceivedPacket(PacketEvent.Receive event) {
         if (checkReceivedPacket.get())
             if (automaticSpamFilter.get()) {
                 if (Packets.size() == automaticSpamFilterStrength.get()) {
                     for (String element : Packets) {
-                        if (!isReceivedDuplicate.add(element)) {
-                            ChatUtils.sendMsg(Formatting.DARK_BLUE, isReceivedDuplicate.toString());
-                            isReceivedDuplicate.clear();
+                        if (isDuplicate(element)) {
                             if (!spamPackets.contains(element)) {
                                 spamPackets.add(element);
                                 ChatUtils.sendMsg(Formatting.DARK_AQUA, "Received packet: " + element + " filtered for spam with those two packets " + Packets);
@@ -150,12 +152,10 @@ public class PacketLogger extends Module {
             if (automaticSpamFilter.get()) {
                 if (Packets.size() == automaticSpamFilterStrength.get()) {
                     for (String element : Packets) {
-                        if (!isSentDuplicate.add(element)) {
-                            ChatUtils.sendMsg(Formatting.BLUE, isSentDuplicate.toString());
-                            isSentDuplicate.clear();
+                        if (isDuplicate(element)) {
                             if (!spamPackets.contains(element)) {
                                 spamPackets.add(element);
-                                ChatUtils.sendMsg(Formatting.DARK_AQUA, "Sent: " + element + " filtered for spam with those two packets " + Packets);
+                                ChatUtils.sendMsg(Formatting.DARK_AQUA, "Sent packet: " + element + " filtered for spam with those two packets " + Packets);
                             }
                         }
                     }

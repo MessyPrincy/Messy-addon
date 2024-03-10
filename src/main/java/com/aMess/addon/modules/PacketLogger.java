@@ -107,35 +107,35 @@ public class PacketLogger extends Module {
     }
 
     List<String> Packets = Collections.synchronizedList(new ArrayList<>());
-    Set<String> seenStrings = new HashSet<>();
-    public boolean isDuplicate(String element) {
-        if (seenStrings.contains(element)) {
-            seenStrings.clear();
-            return true;
-        } else {
-            seenStrings.clear();
-            return false;
-        }
-    }
+    Set<String> isDuplicate = new HashSet<>();
+
+
     @EventHandler
     private void onReceivedPacket(PacketEvent.Receive event) {
         if (checkReceivedPacket.get())
             if (automaticSpamFilter.get()) {
-                if (Packets.size() == automaticSpamFilterStrength.get()) {
-                    for (String element : Packets) {
-                        if (isDuplicate(element)) {
-                            if (!spamPackets.contains(element)) {
-                                spamPackets.add(element);
-                                ChatUtils.sendMsg(Formatting.DARK_AQUA, "Received packet: " + element + " filtered for spam with those two packets " + Packets);
+                if (!spamPackets.contains(event.packet.getClass().getCanonicalName())) {
+                    if (Packets.size() == automaticSpamFilterStrength.get()) {
+                        for (String element : Packets) {
+                            if (!isDuplicate.add(element)) {
+                                if (isDuplicate.size() == Packets.size()) {
+                                    if (!spamPackets.contains(element)) {
+                                        spamPackets.add(element);
+                                        ChatUtils.sendMsg(Formatting.DARK_AQUA, "Received packet: " + element + " filtered for spam with those two packets " + Packets);
+                                    }
+                                } else {
+                                    ChatUtils.sendMsg(Formatting.BLACK, String.valueOf(isDuplicate.size()));
+                                }
                             }
                         }
+                        Packets.clear();
+                        isDuplicate.clear();
+                    } else if (Packets.size() > automaticSpamFilterStrength.get()) {
+                        Packets.clear();
+                        ChatUtils.sendMsg(Formatting.RED, "Too many packets received at the same time");
+                    } else {
+                        Packets.add(event.packet.getClass().getCanonicalName());
                     }
-                    Packets.clear();
-                } else if (Packets.size() > automaticSpamFilterStrength.get()) {
-                    Packets.clear();
-                    ChatUtils.sendMsg(Formatting.RED, "Too many packets received at the same time");
-                } else {
-                    Packets.add(event.packet.getClass().getCanonicalName());
                 }
             }
         if (!spamPackets.contains(event.packet.getClass().getCanonicalName())) {
@@ -152,10 +152,10 @@ public class PacketLogger extends Module {
             if (automaticSpamFilter.get()) {
                 if (Packets.size() == automaticSpamFilterStrength.get()) {
                     for (String element : Packets) {
-                        if (isDuplicate(element)) {
+                        if (!isDuplicate.add(element)) {
                             if (!spamPackets.contains(element)) {
                                 spamPackets.add(element);
-                                ChatUtils.sendMsg(Formatting.DARK_AQUA, "Sent packet: " + element + " filtered for spam with those two packets " + Packets);
+                                ChatUtils.sendMsg(Formatting.DARK_AQUA, "Received packet: " + element + " filtered for spam with those two packets " + Packets);
                             }
                         }
                     }

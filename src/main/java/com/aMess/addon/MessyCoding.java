@@ -1,5 +1,6 @@
 package com.aMess.addon;
 
+import com.aMess.addon.modules.ModeratorTracker;
 import com.aMess.addon.modules.PacketLogger;
 import com.aMess.addon.modules.WitherSpawnDetector;
 import com.mojang.logging.LogUtils;
@@ -22,6 +23,8 @@ public class MessyCoding extends MeteorAddon {
         Modules.get().add(new WitherSpawnDetector());
 
         Modules.get().add(new PacketLogger());
+
+        Modules.get().add(new ModeratorTracker());
 
     }
 

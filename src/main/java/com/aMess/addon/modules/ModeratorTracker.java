@@ -61,12 +61,12 @@ public class ModeratorTracker extends Module {
     private void onJoinPacket(PacketEvent.Receive event) {
         if (event.packet instanceof GameMessageS2CPacket packet) {
             moderatorIdentification.add(modIdentifier.get().trim());
-            if (packet.content().toString().contains("joined the") && modJoin.get()) {
+            if (packet.content().toString().toLowerCase().contains("joined the") && modJoin.get()) {
                 if (packet.content().toString().contains(moderatorIdentification.get(0))) {
                     assert mc.player != null;
                     if (publicNotifier.get()) {
                         mc.player.networkHandler.sendChatMessage(prefix.get().trim() + " Oh no! A mod is here D: HIDE!");
-                        if (packet.content().toString().contains("Gurkenwerfer_")); {
+                        if (packet.content().toString().contains("Gurkenwerfer_")) {
                             mc.player.networkHandler.sendChatMessage(prefix.get().trim() + " Oh wait it's just Gurk. We're safe!... For now");
                         }
                     }
@@ -75,7 +75,7 @@ public class ModeratorTracker extends Module {
                     }
                 }
             }
-            else if (packet.content().toString().contains("left the") && modLeave.get()) {
+            else if (packet.content().toString().toLowerCase().contains("left the") && modLeave.get()) {
                 if (packet.content().toString().contains(moderatorIdentification.get(0))) {
                     assert mc.player != null;
                     if (publicNotifier.get()) {
@@ -87,5 +87,6 @@ public class ModeratorTracker extends Module {
                 }
             }
         }
+        moderatorIdentification.clear();
     }
 }

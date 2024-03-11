@@ -26,7 +26,6 @@ public class PacketLogger extends Module {
         super(MessyCoding.CATEGORY, "Packet Logger", "Logs received and sent packets");
     }
 
-
     private final Setting<Boolean> chatLog = sgConfiguration.add(new BoolSetting.Builder()
         .name("Chat logs")
         .description("Enable/Disables the feature to log the packets in the chat (They are still logged in the console) Useful to prevent crashes")
@@ -35,7 +34,7 @@ public class PacketLogger extends Module {
     );
     private final Setting<Boolean> checkReceivedPacket = sgConfiguration.add(new BoolSetting.Builder()
         .name("Received Packets")
-        .description("Enable/Disables the logger for S2C pac    kets")
+        .description("Enable/Disables the logger for S2C packets")
         .defaultValue(false)
         .build()
     );

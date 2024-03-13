@@ -7,12 +7,10 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 
 import java.util.*;
@@ -116,7 +114,7 @@ public class ModeratorTracker extends Module {
                                 info("%s is doing  shenanigans in vanish");
                             }
                         }
-                    } else continue;
+                    }
                 }
             }
         }

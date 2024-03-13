@@ -66,23 +66,33 @@ public class ModeratorTracker extends Module {
             if (packet.content().toString().toLowerCase().contains("joined the") && modJoin.get()) {
                 if (packet.content().toString().contains(moderatorIdentification.get(0))) {
                     assert mc.player != null;
+                    String packetContent = packet.content().toString();
+                    String[] isolatingDisplayNameScope = packetContent.split(",");
+                    String stuff = isolatingDisplayNameScope[3];
+                    int cutter = stuff.indexOf("}");
+                    String displayName = stuff.substring(10, cutter).trim();
                     if (publicNotifier.get()) {
-                        mc.player.networkHandler.sendChatMessage("Oh no! A mod is here D: HIDE!");
+                        mc.player.networkHandler.sendChatMessage("Oh no! " + displayName + " is here D: HIDE!");
                         if (packet.content().toString().contains("Gurkenwerfer_")) {
                             mc.player.networkHandler.sendChatMessage("Oh wait it's Gurk. Get the Club Mate!");
                         }
                     } else {
-                        ChatUtils.sendMsg(Formatting.DARK_PURPLE, "A mod has joined! D: HIDE!");
+                        info("%s has joined! D: HIDE!", displayName);
                     }
                 }
             }
             else if (packet.content().toString().toLowerCase().contains("left the") && modLeave.get()) {
                 if (packet.content().toString().contains(moderatorIdentification.get(0))) {
                     assert mc.player != null;
+                    String packetContent = packet.content().toString();
+                    String[] isolatingDisplayNameScope = packetContent.split(",");
+                    String stuff = isolatingDisplayNameScope[3];
+                    int cutter = stuff.indexOf("}");
+                    String displayName = stuff.substring(10, cutter).trim();
                     if (publicNotifier.get()) {
-                        mc.player.networkHandler.sendChatMessage("A mod has left, we're safe!");
+                        mc.player.networkHandler.sendChatMessage(displayName + " has left, we're safe!");
                     } else {
-                        info("A mod has left, good news!");
+                        info("%s has left, good news!", displayName);
                     }
                 }
             }

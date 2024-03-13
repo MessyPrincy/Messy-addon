@@ -17,8 +17,6 @@ public class WitherSpawnDetector extends Module {
 
     public WitherSpawnDetector() {
         super(MessyCoding.CATEGORY, "Wither Spawn Detector", "Checks when a wither spawns & sends a message");
-
-
     }
     //Thanks to Gurkenwerfer_ for basically telling me everything
     private final Setting<Boolean> withers = sgWorldEvents.add(new BoolSetting.Builder()

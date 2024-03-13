@@ -117,7 +117,7 @@ public class PacketLogger extends Module {
                     for (String element : Packets) {
                         if (!isDuplicate.add(element) && isDuplicate.size() <= automaticSpamFilterStrength.get() && !spamPackets.contains(element)) {
                             spamPackets.add(element);
-                            ChatUtils.sendMsg(Formatting.AQUA, "Received packet: " + element + " filtered for spam");
+                            ChatUtils.sendMsg(Formatting.AQUA, "Received packet: %s filtered for spam", element);
                         }
                     }
                     Packets.clear();
@@ -137,7 +137,7 @@ public class PacketLogger extends Module {
             if (!spamPackets.contains(event.packet.getClass().getCanonicalName())) {
                 assert mc.player != null;
                 if (chatLog.get()) {
-                    ChatUtils.sendMsg(Formatting.DARK_GREEN, "Received packet: " + event.packet.toString(), false);
+                    ChatUtils.sendMsg(Formatting.DARK_GREEN, "Received packet: %s", event.packet.toString());
                 }
                 else {
                     LogUtils.getLogger().info(event.packet.toString());
@@ -155,7 +155,7 @@ public class PacketLogger extends Module {
                         for (String element : Packets) {
                             if (!isDuplicate.add(element) && isDuplicate.size() <= automaticSpamFilterStrength.get() && !spamPackets.contains(element)) {
                                 spamPackets.add(element);
-                                ChatUtils.sendMsg(Formatting.AQUA, "Sent packet: " + element + " filtered for spam");
+                                ChatUtils.sendMsg(Formatting.AQUA, "Sent packet: %s filtered for spam", element);
                             }
                         }
                         Packets.clear();
@@ -172,7 +172,7 @@ public class PacketLogger extends Module {
             if (!spamPackets.contains(event.packet.getClass().getCanonicalName())) {
                 assert mc.player != null;
                 if (chatLog.get()) {
-                    ChatUtils.sendMsg(Formatting.DARK_RED, "Sent packet: " + event.packet.toString(), false);
+                    ChatUtils.sendMsg(Formatting.DARK_RED, "Sent packet: %s", event.packet.toString());
                 }
                 else {
                     LogUtils.getLogger().info(event.packet.toString());

@@ -67,10 +67,10 @@ public class ModeratorTracker extends Module {
                 if (packet.content().toString().contains(moderatorIdentification.get(0))) {
                     assert mc.player != null;
                     String packetContent = packet.content().toString();
-                    String[] isolatingDisplayNameScope = packetContent.split(",");
-                    String stuff = isolatingDisplayNameScope[3];
-                    int cutter = stuff.indexOf("}");
-                    String displayName = stuff.substring(10, cutter).trim();
+                    String[] separatingScopes = packetContent.split(",");
+                    String isolatingDisplayNameScope = separatingScopes[3];
+                    int cutter = isolatingDisplayNameScope.indexOf("}");
+                    String displayName = isolatingDisplayNameScope.substring(10, cutter).trim();
                     if (publicNotifier.get()) {
                         mc.player.networkHandler.sendChatMessage("Oh no! " + displayName + " is here D: HIDE!");
                         if (packet.content().toString().contains("Gurkenwerfer_")) {
@@ -85,10 +85,10 @@ public class ModeratorTracker extends Module {
                 if (packet.content().toString().contains(moderatorIdentification.get(0))) {
                     assert mc.player != null;
                     String packetContent = packet.content().toString();
-                    String[] isolatingDisplayNameScope = packetContent.split(",");
-                    String stuff = isolatingDisplayNameScope[3];
-                    int cutter = stuff.indexOf("}");
-                    String displayName = stuff.substring(10, cutter).trim();
+                    String[] separatingScopes = packetContent.split(",");
+                    String isolatingDisplayNameScope = separatingScopes[3];
+                    int cutter = isolatingDisplayNameScope.indexOf("}");
+                    String displayName = isolatingDisplayNameScope.substring(10, cutter).trim();
                     if (publicNotifier.get()) {
                         mc.player.networkHandler.sendChatMessage(displayName + " has left, we're safe!");
                     } else {

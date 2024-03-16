@@ -62,7 +62,7 @@ public class ModeratorTracker extends Module {
         if (event.packet instanceof GameMessageS2CPacket packet) {
             moderatorIdentification.add(modIdentifier.get().trim());
             if (packet.content().toString().toLowerCase().contains("joined the") && modJoin.get()) {
-                if (packet.content().toString().contains(moderatorIdentification.get(0))) {
+                if (packet.content().toString().contains(moderatorIdentification.get(0)) || packet.content().toString().contains("bananababoo")) {
                     assert mc.player != null;
                     String packetContent = packet.content().toString();
                     String[] separatingScopes = packetContent.split(",");
@@ -70,7 +70,14 @@ public class ModeratorTracker extends Module {
                     int cutter = isolatingDisplayNameScope.indexOf("}");
                     String displayName = isolatingDisplayNameScope.substring(10, cutter).trim();
                     if (publicNotifier.get()) {
-                        mc.player.networkHandler.sendChatMessage("Oh no! " + displayName + " is here D: HIDE!");
+                        List<String> messageContent =
+                            List.of(
+                                "Quick, everybody act natural! " + displayName + " incoming!",
+                                "Oh no! " + displayName + " is here D: HIDE!",
+                                "Emergency protocol engaged! " + displayName + " sighting imminent! HIDE!!",
+                                "Sound the alarms, " + displayName + " detected!"
+                            );
+                        mc.player.networkHandler.sendChatMessage(messageContent.get((int) (Math.random() * messageContent.size())));
                         if (packet.content().toString().contains("Gurkenwerfer_")) {
                             mc.player.networkHandler.sendChatMessage("Oh wait it's Gurk. Get the Club Mate!");
                         }
@@ -80,7 +87,7 @@ public class ModeratorTracker extends Module {
                 }
             }
             else if (packet.content().toString().toLowerCase().contains("left the") && modLeave.get()) {
-                if (packet.content().toString().contains(moderatorIdentification.get(0))) {
+                if (packet.content().toString().contains(moderatorIdentification.get(0)) || packet.content().toString().contains("bananababoo")) {
                     assert mc.player != null;
                     String packetContent = packet.content().toString();
                     String[] separatingScopes = packetContent.split(",");
@@ -88,7 +95,14 @@ public class ModeratorTracker extends Module {
                     int cutter = isolatingDisplayNameScope.indexOf("}");
                     String displayName = isolatingDisplayNameScope.substring(10, cutter).trim();
                     if (publicNotifier.get()) {
-                        mc.player.networkHandler.sendChatMessage(displayName + " has left, we're safe!");
+                        List<String> messageContent =
+                            List.of(
+                                "Phew, the " + displayName + "'s gone! Time to let loose and relax a bit.",
+                                "Finally, freedom reigns! " + displayName + "'s departure calls for celebration.",
+                                displayName + "'s departure means we can relax without constantly looking over our shoulders.",
+                                displayName + " has left, we're safe!"
+                            );
+                        mc.player.networkHandler.sendChatMessage(messageContent.get((int) (Math.random() * messageContent.size())));
                     } else {
                         info("%s has left, good news!", displayName);
                     }
@@ -109,10 +123,6 @@ public class ModeratorTracker extends Module {
                         GameMode gameMode = player.gameMode();
                         if (suspiciousPlayer.getGameMode() != gameMode) {
                             info("%s changed mode to %s", suspiciousPlayer.getProfile().getName(), player.gameMode());
-                            assert mc.world != null;
-                            if (!mc.world.getPlayers().toString().contains(suspiciousPlayer.getProfile().getName())) {
-                                info("%s is doing  shenanigans in vanish");
-                            }
                         }
                     }
                 }

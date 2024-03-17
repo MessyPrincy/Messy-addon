@@ -5,6 +5,10 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Vec3d;
 
 public class MessyFlight extends Module {
     public SettingGroup sgFlightSettings = settings.getDefaultGroup();
@@ -50,6 +54,12 @@ public class MessyFlight extends Module {
         .sliderMax(0.5)
         .build()
     );
+    private final Setting<Boolean> vehicleFlight = sgFlightSettings.add(new BoolSetting.Builder()
+        .name("Vehicle Flight")
+        .description("Fly with a vehicle")
+        .defaultValue(false)
+        .build()
+    );
 
     public MessyFlight() {
         super(MessyCoding.CATEGORY, "Messy Flight", "Lets you fly ?");
@@ -58,70 +68,66 @@ public class MessyFlight extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         assert mc.player != null;
-
-        if ((!mc.player.isOnGround()) && !mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
+        Entity vehicle = mc.player.getVehicle();
+        assert vehicle != null;
+        Entity player = mc.player;
+        KeyBinding sneakKey = mc.options.sneakKey;
+        KeyBinding jumpKey = mc.options.jumpKey;
+        if (vehicleFlight.get() && mc.player.hasVehicle()) {
+            player = vehicle;
+            sneakKey = mc.options.attackKey;
+            jumpKey = mc.options.useKey;
+        }
+        if ((!player.isOnGround()) && !mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
             if (mc.player.age % tickInterval.get() == 0) {
-                mc.player.setPosition(mc.player.getX(), mc.player.getY() - tickFall.get(), mc.player.getZ());
-            }
-            else {
-                mc.player.setVelocity(mc.player.getVelocity().x, 0.007, mc.player.getVelocity().z);
+                player.setPosition(player.getX(), player.getY() - tickFall.get(), player.getZ());
+            } else {
+                player.setVelocity(player.getVelocity().x, 0.007, player.getVelocity().z);
             }
 
             if (mc.options.forwardKey.isPressed()) {
                 if (mc.options.sprintKey.isPressed()) {
-                    mc.player.setVelocity(mc.player.getRotationVector().multiply(flightSpeed.get() * sprintBoost.get()));
-                }
-                else  {
-                    mc.player.setVelocity(mc.player.getRotationVector().multiply(flightSpeed.get()));
-                }
-            }
-            else if (mc.options.backKey.isPressed()) {
-                if (mc.options.sprintKey.isPressed()) {
-                    mc.player.setVelocity(mc.player.getRotationVector().multiply(- flightSpeed.get() * sprintBoost.get()));
-                }
-                else {
-                    mc.player.setVelocity(mc.player.getRotationVector().multiply(-flightSpeed.get()));
-                }
-            }
-            else if (mc.options.rightKey.isPressed()) {
-                if (mc.options.sprintKey.isPressed()) {
-                    mc.player.setVelocity(mc.player.getRotationVector().rotateY((float) -Math.PI / 2).multiply(flightSpeed.get() * sprintBoost.get()));
+                    player.setVelocity(player.getRotationVector().multiply(flightSpeed.get() * sprintBoost.get()));
                 } else {
-                    mc.player.setVelocity(mc.player.getRotationVector().rotateY((float) -Math.PI / 2).multiply(flightSpeed.get()));
+                    player.setVelocity(player.getRotationVector().multiply(flightSpeed.get()));
                 }
-            }
-            else if (mc.options.leftKey.isPressed()) {
+            } else if (mc.options.backKey.isPressed()) {
                 if (mc.options.sprintKey.isPressed()) {
-                    mc.player.setVelocity(mc.player.getRotationVector().rotateY((float) Math.PI / 2).multiply(flightSpeed.get() * sprintBoost.get()));
+                    player.setVelocity(player.getRotationVector().multiply(-flightSpeed.get() * sprintBoost.get()));
                 } else {
-                    mc.player.setVelocity(mc.player.getRotationVector().rotateY((float) Math.PI / 2).multiply(flightSpeed.get()));
+                    player.setVelocity(player.getRotationVector().multiply(-flightSpeed.get()));
                 }
+            } else if (mc.options.rightKey.isPressed()) {
+                if (mc.options.sprintKey.isPressed()) {
+                    player.setVelocity(player.getRotationVector().rotateY((float) -Math.PI / 2).multiply(flightSpeed.get() * sprintBoost.get()));
+                } else {
+                    player.setVelocity(player.getRotationVector().rotateY((float) -Math.PI / 2).multiply(flightSpeed.get()));
+                }
+            } else if (mc.options.leftKey.isPressed()) {
+                if (mc.options.sprintKey.isPressed()) {
+                    player.setVelocity(player.getRotationVector().rotateY((float) Math.PI / 2).multiply(flightSpeed.get() * sprintBoost.get()));
+                } else {
+                    player.setVelocity(player.getRotationVector().rotateY((float) Math.PI / 2).multiply(flightSpeed.get()));
+                }
+            } else {
+                player.setVelocity(0, player.getVelocity().y, 0);
             }
-            else {
-                mc.player.setVelocity(0, mc.player.getVelocity().y,0);
-            }
-        }
-
-        else if (mc.options.jumpKey.isPressed()) {
+        } else if (jumpKey.isPressed()) {
             if (mc.player.age % tickInterval.get() == 0) {
-                mc.player.setPosition(mc.player.getX(), mc.player.getY() - tickFall.get(), mc.player.getZ());
+                player.setPosition(player.getX(), player.getY() - tickFall.get(), player.getZ());
             } else {
                 if (mc.options.sprintKey.isPressed()) {
-                    mc.player.setVelocity(mc.player.getVelocity().add(0, ySpeed.get() * sprintBoost.get(), 0));
-                }
-                else {
-                    mc.player.setVelocity(mc.player.getVelocity().add(0, ySpeed.get(), 0));
+                    player.setVelocity(player.getVelocity().add(0, ySpeed.get() * sprintBoost.get(), 0));
+                } else {
+                    player.setVelocity(player.getVelocity().add(0, ySpeed.get(), 0));
                 }
             }
-        }
-
-        else if (mc.options.sneakKey.isPressed()) {
+        } else if (sneakKey.isPressed()) {
             if (mc.options.sprintKey.isPressed()) {
-                mc.player.setVelocity(mc.player.getVelocity().add(0, -ySpeed.get() * sprintBoost.get(), 0));
-            }
-            else {
-                mc.player.setVelocity(mc.player.getVelocity().add(0, -ySpeed.get(), 0));
+                player.setVelocity(player.getVelocity().add(0, -ySpeed.get() * sprintBoost.get(), 0));
+            } else {
+                player.setVelocity(player.getVelocity().add(0, -ySpeed.get(), 0));
             }
         }
     }
-    }
+}

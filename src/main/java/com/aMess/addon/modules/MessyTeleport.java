@@ -77,7 +77,7 @@ public class MessyTeleport extends Module {
                             teleportDistance = 0;
                         }
                     }
-                    for (int i = 0; i < 8; i++) {
+                    for (int i = 0; i < 12; i++) {
                         PlayerMoveC2SPacket currentPosition;
                         currentPosition = new PlayerMoveC2SPacket.Full(mc.player.getX(),
                             mc.player.getY(),
@@ -112,7 +112,7 @@ public class MessyTeleport extends Module {
                             teleportDistance = 0;
                         }
                     }
-                    for (int i = 0; i < 8; i++) {
+                    for (int i = 0; i < 12; i++) {
                         PlayerMoveC2SPacket currentPosition;
                         currentPosition = new PlayerMoveC2SPacket.Full(mc.player.getX(),
                             mc.player.getY(),

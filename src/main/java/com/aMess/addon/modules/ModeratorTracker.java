@@ -97,7 +97,7 @@ public class ModeratorTracker extends Module {
                     if (publicNotifier.get()) {
                         List<String> messageContent =
                             List.of(
-                                "Phew, the " + displayName + "'s gone! Time to let loose and relax a bit.",
+                                "Phew, " + displayName + "'s gone! Time to let loose and relax a bit.",
                                 "Finally, freedom reigns! " + displayName + "'s departure calls for celebration.",
                                 displayName + "'s departure means we can relax without constantly looking over our shoulders.",
                                 displayName + " has left, we're safe!"

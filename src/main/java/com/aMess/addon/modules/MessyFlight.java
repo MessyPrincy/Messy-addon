@@ -75,10 +75,8 @@ public class MessyFlight extends Module {
         KeyBinding jumpKey = mc.options.jumpKey;
         if (vehicleFlight.get() && mc.player.hasVehicle()) {
             player = vehicle;
-            sneakKey = mc.options.attackKey;
-            jumpKey = mc.options.useKey;
         }
-        if ((!player.isOnGround()) && !mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
+        if ((!mc.player.isOnGround()) && !mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed()) {
             if (mc.player.age % tickInterval.get() == 0) {
                 player.setPosition(player.getX(), player.getY() - tickFall.get(), player.getZ());
             } else {

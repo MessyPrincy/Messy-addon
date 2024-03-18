@@ -163,7 +163,6 @@ public class MessyTeleport extends Module {
 
         while (currentPos.getY() > -60) {
             if (mc.world.getBlockState(currentPos).isAir() && mc.world.getBlockState(currentPos.down()).isAir() && !mc.world.getBlockState(currentPos.down().down()).isAir()) {
-                // Shift the last air block references
                 lastAirBlock2 = currentPos;
                 currentPos = currentPos.down(320);
             }
@@ -175,12 +174,11 @@ public class MessyTeleport extends Module {
 
     public BlockPos findAirAbovePlayer(BlockPos playerPos) {
         assert mc.world != null;
-        BlockPos currentPos = playerPos.up().up();
+        BlockPos currentPos = playerPos.up().up().up(); //Need to check three blocks up to prevent false detections such as standing on redstone
         BlockPos lastAirBlock2 = null;
 
         while (currentPos.getY() < 320) {
             if (mc.world.getBlockState(currentPos).isAir() && mc.world.getBlockState(currentPos.down()).isAir() && !mc.world.getBlockState(currentPos.down().down()).isAir()) {
-                // Shift the last air block references\
                 lastAirBlock2 = currentPos;
                 currentPos = currentPos.up(320);
             }

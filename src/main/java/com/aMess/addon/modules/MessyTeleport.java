@@ -88,7 +88,7 @@ public class MessyTeleport extends Module {
                         Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(currentPosition);
                     }
                     PlayerMoveC2SPacket newPosition;
-                    newPosition = new PlayerMoveC2SPacket.Full( mc.player.getX(),
+                    newPosition = new PlayerMoveC2SPacket.Full(mc.player.getX(),
                         mc.player.getY() - teleportDistance,
                         mc.player.getZ(),
                         mc.player.getYaw(0),
@@ -103,7 +103,7 @@ public class MessyTeleport extends Module {
                     if (autoTeleport.get()) {
                         if (blockAbovePos != null) {
                             y = blockAbovePos.up().getY();
-                            teleportDistance = playerPos.getY() - y;
+                            teleportDistance = playerPos.getY() + 1 - y;
                             teleportDistance = -teleportDistance;
                             info("Air block is %s above you", teleportDistance);
                         }
@@ -123,7 +123,7 @@ public class MessyTeleport extends Module {
                         Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(currentPosition);
                     }
                     PlayerMoveC2SPacket newPosition;
-                    newPosition = new PlayerMoveC2SPacket.Full( mc.player.getX(),
+                    newPosition = new PlayerMoveC2SPacket.Full(mc.player.getX(),
                         mc.player.getY() + teleportDistance,
                         mc.player.getZ(),
                         mc.player.getYaw(0),
@@ -135,9 +135,9 @@ public class MessyTeleport extends Module {
                 }
             }
             case Horizontal -> {
-                int numberOfSetPositions = horizontalTeleportDistance.get() / 8;
-                int rest = horizontalTeleportDistance.get() - (numberOfSetPositions * 8);
-                for (int i = 0 ; i < numberOfSetPositions ; i++) {
+                double maxDistancePerPacket = 8;
+                double teleportDistance = Math.ceil(horizontalTeleportDistance.get()/maxDistancePerPacket);
+                for (int i = 1 ; i <= teleportDistance ; i++) {
                     PlayerMoveC2SPacket newPosition;
                     newPosition = new PlayerMoveC2SPacket.Full( mc.player.getX() + 8,
                         mc.player.getY(),
@@ -146,9 +146,7 @@ public class MessyTeleport extends Module {
                         mc.player.getPitch(0),
                         mc.player.isOnGround());
                     Objects.requireNonNull(mc.getNetworkHandler()).sendPacket(newPosition);
-                    mc.player.setPosition(mc.player.getX() + 8, mc.player.getY(), mc.player.getZ());
                 }
-                mc.player.setPosition(mc.player.getX() + rest, mc.player.getY(), mc.player.getZ());
                 toggle();
             }
             case Location -> {}

@@ -18,7 +18,7 @@ public class MessyFlight extends Module {
         .description("How much does the sprint key boost your speed")
         .defaultValue(2)
         .min(0)
-        .sliderMax(5)
+        .sliderMax(20)
         .build()
     );
 
@@ -27,7 +27,7 @@ public class MessyFlight extends Module {
         .description("The speed at which you move in the air")
         .defaultValue(0.5)
         .min(0)
-        .sliderMax(4.5)
+        .sliderMax(10)
         .build()
     );
     private final Setting<Double> ySpeed = sgFlightSettings.add(new DoubleSetting.Builder()
@@ -68,8 +68,18 @@ public class MessyFlight extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         assert mc.player != null;
+
+        float yaw = mc.player.getYaw();
+        double radiansYaw = Math.toRadians(yaw);
+        double cameraX = -Math.sin(radiansYaw);
+        double cameraZ = Math.cos(radiansYaw);
+        Vec3d direction = new Vec3d(cameraX, 0, cameraZ).normalize();
+
+        Vec3d movementDirection = new Vec3d(0, 0, 0);
+
         Entity vehicle = mc.player.getVehicle();
         assert vehicle != null;
+
         Entity player = mc.player;
         KeyBinding sneakKey = mc.options.sneakKey;
         KeyBinding jumpKey = mc.options.jumpKey;
@@ -85,27 +95,27 @@ public class MessyFlight extends Module {
 
             if (mc.options.forwardKey.isPressed()) {
                 if (mc.options.sprintKey.isPressed()) {
-                    player.setVelocity(player.getRotationVector().multiply(flightSpeed.get() * sprintBoost.get()));
+                    player.setVelocity(movementDirection.add(direction.multiply(flightSpeed.get() * sprintBoost.get())));
                 } else {
-                    player.setVelocity(player.getRotationVector().multiply(flightSpeed.get()));
+                    player.setVelocity(movementDirection.add(direction.multiply(flightSpeed.get())));
                 }
             } else if (mc.options.backKey.isPressed()) {
                 if (mc.options.sprintKey.isPressed()) {
-                    player.setVelocity(player.getRotationVector().multiply(-flightSpeed.get() * sprintBoost.get()));
+                    player.setVelocity(movementDirection.add(direction.multiply(-flightSpeed.get() * sprintBoost.get())));
                 } else {
-                    player.setVelocity(player.getRotationVector().multiply(-flightSpeed.get()));
+                    player.setVelocity(movementDirection.add(direction.multiply(-flightSpeed.get())));
                 }
             } else if (mc.options.rightKey.isPressed()) {
                 if (mc.options.sprintKey.isPressed()) {
-                    player.setVelocity(player.getRotationVector().rotateY((float) -Math.PI / 2).multiply(flightSpeed.get() * sprintBoost.get()));
+                    player.setVelocity(movementDirection.add(direction.rotateY((float) -Math.PI / 2).normalize().multiply(flightSpeed.get() * sprintBoost.get())));
                 } else {
-                    player.setVelocity(player.getRotationVector().rotateY((float) -Math.PI / 2).multiply(flightSpeed.get()));
+                    player.setVelocity(movementDirection.add(direction.rotateY((float) -Math.PI / 2).normalize().multiply(flightSpeed.get())));
                 }
             } else if (mc.options.leftKey.isPressed()) {
                 if (mc.options.sprintKey.isPressed()) {
-                    player.setVelocity(player.getRotationVector().rotateY((float) Math.PI / 2).multiply(flightSpeed.get() * sprintBoost.get()));
+                    player.setVelocity(movementDirection.add(direction.rotateY((float) Math.PI / 2).normalize().multiply(flightSpeed.get() * sprintBoost.get())));
                 } else {
-                    player.setVelocity(player.getRotationVector().rotateY((float) Math.PI / 2).multiply(flightSpeed.get()));
+                    player.setVelocity(movementDirection.add(direction.rotateY((float) Math.PI / 2).normalize().multiply(flightSpeed.get())));
                 }
             } else {
                 player.setVelocity(0, player.getVelocity().y, 0);

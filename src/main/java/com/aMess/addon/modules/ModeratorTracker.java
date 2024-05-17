@@ -1,8 +1,10 @@
 package com.aMess.addon.modules;
 
 import com.aMess.addon.MessyCoding;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.suggestion.Suggestion;
+import meteordevelopment.meteorclient.events.game.ReceiveMessageEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
+import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
@@ -11,13 +13,16 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
+import net.minecraft.network.packet.s2c.play.CommandSuggestionsS2CPacket;
+import net.minecraft.network.packet.c2s.play.RequestCommandCompletionsC2SPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 
+
 import java.util.*;
+import java.util.function.Predicate;
 
 public class ModeratorTracker extends Module {
     private final SettingGroup sgInformation = settings.createGroup("Information");
@@ -37,8 +42,8 @@ public class ModeratorTracker extends Module {
         .build()
     );
     private final Setting<Boolean> normalJoin = sgNonModVanillaActions.add(new BoolSetting.Builder()
-        .name("Non-Moderator Joins")
-        .description("Automatically sends you a message if a player joins joins")
+        .name("A player joins or leaves")
+        .description("Automatically detects when a player joins or leave using /msg")
         .defaultValue(false)
         .build()
     );
@@ -73,6 +78,27 @@ public class ModeratorTracker extends Module {
         .build()
     );
     List<String> moderatorIdentification = Collections.synchronizedList(new ArrayList<>());
+
+    private final Random random = new Random();
+    private final List<Integer> completionIDs = new ArrayList<>();
+    private List<String> completionPlayerCache = new ArrayList<>();
+    private int timer = 0;
+    String command = "/msg";
+
+    @Override
+    public void onActivate() {
+        timer = 0;
+        completionIDs.clear();
+    }
+    @EventHandler
+    private void onTick(TickEvent.Post event) {
+        timer++;
+        if (timer < 100) return;
+        int id = random.nextInt(200);
+        completionIDs.add(id);
+        mc.getNetworkHandler().sendPacket(new RequestCommandCompletionsC2SPacket(id, command + " "));
+        timer = 0;
+    }
 
     @EventHandler
     private void onJoinMessagePacket(PacketEvent.Receive event) {
@@ -159,6 +185,41 @@ public class ModeratorTracker extends Module {
     }
 
     @EventHandler
+    private void onPacket(PacketEvent.Receive event) {
+        if (normalJoin.get() && event.packet instanceof CommandSuggestionsS2CPacket packet) {
+            if (completionIDs.contains(packet.getCompletionId())) {
+                assert mc.player != null;
+                var lastUsernames = completionPlayerCache.stream().toList();
+
+                completionPlayerCache = packet.getSuggestions().getList().stream()
+                    .map(Suggestion::getText)
+                    .toList();
+
+                if (lastUsernames.isEmpty()) return;
+
+                Predicate<String> joinedOrQuit = playerName -> lastUsernames.contains(playerName) != completionPlayerCache.contains(playerName);
+
+                for (String playerName : completionPlayerCache) {
+                    if (Objects.equals(playerName, mc.player.getName().getString())) continue;
+                    if (joinedOrQuit.test(playerName)) {
+                        info("Player joined: " + playerName);
+                    }
+                }
+
+                for (String playerName : lastUsernames) {
+                    if (Objects.equals(playerName, mc.player.getName().getString())) continue;
+                    if (joinedOrQuit.test(playerName)) {
+                        info("Player left: " + playerName);
+                    }
+                }
+
+                completionIDs.remove(Integer.valueOf(packet.getCompletionId()));
+                event.cancel();
+            }
+        }
+    }
+
+    @EventHandler
     private void onGameModeChange(PacketEvent.Receive event) {
         if (event.packet instanceof PlayerListS2CPacket packet) {
             if (gamemodeChange.get()) {
@@ -176,4 +237,7 @@ public class ModeratorTracker extends Module {
         }
     }
 }
+
+//For the vanish detector, all the credit to: https://github.com/xtrm-en/meteor-antistaff/blob/main/src/main/java/me/xtrm/meteorclient/antistaff/modules/AntiStaff.java
+
 

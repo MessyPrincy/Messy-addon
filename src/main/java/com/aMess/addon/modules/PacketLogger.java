@@ -19,7 +19,7 @@ import java.util.*;
 //Mostly for personal use to get access to sent and received packets
 public class PacketLogger extends Module {
 
-    private final SettingGroup sgConfiguration = settings.createGroup("Configuration");
+    private final SettingGroup sgConfiguration = this.settings.createGroup("Configuration");
     private final SettingGroup sgSpam = settings.createGroup("Spam filters");
 
     public PacketLogger() {

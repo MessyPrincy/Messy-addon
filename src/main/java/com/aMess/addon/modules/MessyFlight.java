@@ -11,7 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec3d;
 
 public class MessyFlight extends Module {
-    public SettingGroup sgFlightSettings = settings.getDefaultGroup();
+    public SettingGroup sgFlightSettings = this.settings.getDefaultGroup();
 
     private final Setting<Integer> sprintBoost = sgFlightSettings.add(new IntSetting.Builder()
         .name("Sprint Boost")

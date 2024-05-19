@@ -187,7 +187,7 @@ public class ModeratorTracker extends Module {
     @EventHandler
     private void onPacket(PacketEvent.Receive event) {
         if (normalJoin.get() && event.packet instanceof CommandSuggestionsS2CPacket packet) {
-            if (completionIDs.contains(packet.getCompletionId())) {
+            if (completionIDs.contains(packet.id())) {
                 assert mc.player != null;
                 var lastUsernames = completionPlayerCache.stream().toList();
 
@@ -213,7 +213,7 @@ public class ModeratorTracker extends Module {
                     }
                 }
 
-                completionIDs.remove(Integer.valueOf(packet.getCompletionId()));
+                completionIDs.remove(Integer.valueOf(packet.id()));
                 event.cancel();
             }
         }
@@ -239,5 +239,3 @@ public class ModeratorTracker extends Module {
 }
 
 //For the vanish detector, all the credit to: https://github.com/xtrm-en/meteor-antistaff/blob/main/src/main/java/me/xtrm/meteorclient/antistaff/modules/AntiStaff.java
-
-

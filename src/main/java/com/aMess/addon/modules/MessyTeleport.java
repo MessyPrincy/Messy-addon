@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.Objects;
 
 public class MessyTeleport extends Module {
-    public SettingGroup sgTeleportSettings = settings.getDefaultGroup();
+    public SettingGroup sgTeleportSettings = this.settings.getDefaultGroup();
     private final Setting<Mode> mode = sgTeleportSettings.add(new EnumSetting.Builder<Mode>()
         .name("mode")
         .description("The mode for Flight.")

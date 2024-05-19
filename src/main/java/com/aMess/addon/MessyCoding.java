@@ -1,21 +1,22 @@
 package com.aMess.addon;
 
 import com.aMess.addon.modules.*;
-import com.mojang.logging.LogUtils;
+import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.hud.HudGroup;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessyCoding extends MeteorAddon {
-    public static final Logger LOG = LogUtils.getLogger();
+    public static final Logger LOG = LoggerFactory.getLogger("Messy");
     public static final Category CATEGORY = new Category("Messy Coding");
-    public static final HudGroup HUD_GROUP = new HudGroup("");
+    public static final HudGroup HUD_GROUP = new HudGroup("Messy Coding");
 
     @Override
     public void onInitialize() {
-        LOG.info("Initializing Meteor Addon Template");
+        LOG.info("Initializing Messy Coding");
 
         // Modules
         Modules.get().add(new WitherSpawnDetector());
@@ -34,9 +35,10 @@ public class MessyCoding extends MeteorAddon {
     public void onRegisterCategories() {
         Modules.registerCategory(CATEGORY);
     }
-
     @Override
     public String getPackage() {
         return "com.aMess.addon";
     }
+
+
 }
